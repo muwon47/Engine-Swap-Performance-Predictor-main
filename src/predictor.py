@@ -38,8 +38,9 @@ class EngineSwapPredictor:
         try:
             self.ml_model = joblib.load("data/hybrid_xgb_model.joblib")
             self.is_hybrid = True
-        except FileNotFoundError:
-            # Fallback to the old linear model if file doesn't exist
+        except Exception:
+            # Fallback to the lightweight in-repo model if the saved ML artifact
+            # is unavailable or its optional dependencies are not installed.
             self.ml_model = None
             self.is_hybrid = False
         self.records = build_training_records()
