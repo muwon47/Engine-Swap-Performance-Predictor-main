@@ -103,8 +103,8 @@ class PredictorRequestHandler(BaseHTTPRequestHandler):
 
 
 def main() -> None:
-    host = "127.0.0.1"
-    port = 8000
+    host = os.environ.get("HOST", "0.0.0.0")
+    port = int(os.environ.get("PORT", "8000"))
     server = ThreadingHTTPServer((host, port), PredictorRequestHandler)
     print(f"Engine Swap Performance Predictor running at http://{host}:{port}")
     print("Press Ctrl+C to stop.")
