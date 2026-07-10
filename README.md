@@ -77,7 +77,7 @@ Showcases the machine learning models evaluated during development, including **
 
 ## 📂 Training Datasets
 
-<img width="1838" height="908" alt="datasets" src="https://github.com/user-attachments/assets/8a55705b-190d-4d90-bf10-7287dd5c1375" />"
+<img width="1838" height="908" alt="datasets" src="https://github.com/user-attachments/assets/8a55705b-190d-4d90-bf10-7287dd5c1375" />
 
 Displays the real-world datasets used to train the prediction models, including **EPA Fuel Economy**, **Car Features & MSRP**, **Vehicle Dynamics**, and **Engine Swap Community Logs**, providing the foundation for accurate performance estimation and compatibility analysis.
 
