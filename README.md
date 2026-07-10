@@ -4,6 +4,8 @@ A mini project based on the supplied system-design slides. It predicts post-swap
 
 The project is intentionally runnable with **Python standard library only**. The slides mention scikit-learn, XGBoost, SHAP, FastAPI, React, MongoDB, and Docker as a production stack; this mini version mirrors those ideas with a lightweight in-repo model and a simple browser UI.
 
+*🔗 [Live Link](https://engine-swap-performance-predictor-main.onrender.com)*
+
 ## Features
 
 - Multi-output regression for horsepower, torque, and 0-60 mph.
