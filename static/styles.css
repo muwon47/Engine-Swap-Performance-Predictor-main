@@ -1079,3 +1079,13 @@ html {
     padding-left: 26px;
   }
 }
+/* Remove decorative blue strip from Fitment Readiness card */
+#compatibility .metric::before {
+  display: none !important;
+  content: none !important;
+}
+
+#compatibility .metric {
+  padding-left: 0 !important;
+  overflow: visible;
+}
