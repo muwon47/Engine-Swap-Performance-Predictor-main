@@ -1,0 +1,9 @@
+{
+  "engine_code": "K24A",
+  "chassis_code": "MX5_NA",
+  "tune_level": 0.65,
+  "cooling_capacity_index": 0.74,
+  "tire_grip_index": 0.78,
+  "suspension_index": 0.72,
+  "gear_ratio": 4.3
+}

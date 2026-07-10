@@ -1,0 +1,532 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Engine Swap Performance Predictor</title>
+    <meta name="description" content="Predict post-swap horsepower, torque, and 0-60 mph time for your engine swap project. Get compatibility scores, feature importance, and tuning tips.">
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <div class="bg-layer"></div>
+    <header class="hero">
+      <p class="eyebrow">System Features</p>
+      <h1>Engine Swap Predictor</h1>
+      <p class="lede">
+        Discover the perfect match for your chassis. AI-driven multi-output regression, compatibility scoring, and automated tuning recommendations.
+      </p>
+    </header>
+
+    <main>
+      <section class="panel">
+        <div class="section-title">
+          <p class="eyebrow">Interactive Input</p>
+          <h2>Configure Your Swap</h2>
+        </div>
+
+        <div class="visuals-grid">
+          <div class="visual-card" id="engine-visual">
+            <img src="/engine_img.webp" alt="Donor Engine" id="engine-img">
+            <div class="visual-label" id="engine-label">Donor Engine</div>
+          </div>
+          <div class="visual-card" id="chassis-visual">
+            <img src="/car_img.webp" alt="Recipient Chassis" id="chassis-img">
+            <div class="visual-label" id="chassis-label">Recipient Chassis</div>
+          </div>
+        </div>
+
+        <form id="predict-form" class="grid form-grid">
+          <!-- Sandbox Mode Toggle -->
+          <div class="sandbox-toggle-container" style="grid-column: 1 / -1;">
+            <div style="display:flex; flex-direction:column; gap:4px">
+              <span style="font-weight:800; color:#fff; font-size:1.05rem">Sandbox Custom Mode</span>
+              <span class="muted" style="font-size:0.8rem">Design custom donor engine and chassis parameters</span>
+            </div>
+            <label class="switch" style="flex-direction:row; gap:0;">
+              <input type="checkbox" id="sandbox-toggle" name="sandbox_enabled">
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <!-- Custom Sandbox Fields container -->
+          <div id="sandbox-fields" class="grid form-grid" style="grid-column: 1 / -1; display: none;">
+            <div class="sandbox-section-title">Custom Donor Engine Specs</div>
+            
+            <label>
+              <div style="display:flex; justify-content:space-between; align-items:center">
+                Custom Engine Name
+                <button type="button" class="info-btn" data-info="custom_engine_name" aria-label="Info about Custom Engine Name">
+                  <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                </button>
+              </div>
+              <input type="text" name="custom_engine_name" value="Custom V8 Sleeper" placeholder="e.g. built lsx">
+            </label>
+            <label>
+              <div style="display:flex; justify-content:space-between; align-items:center">
+                Displacement (Liters)
+                <button type="button" class="info-btn" data-info="custom_displacement_l" aria-label="Info about Displacement">
+                  <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                </button>
+              </div>
+              <input type="number" name="custom_displacement_l" min="1.0" max="8.5" step="0.1" value="4.0">
+            </label>
+            <label>
+              <div style="display:flex; justify-content:space-between; align-items:center">
+                Cylinders
+                <button type="button" class="info-btn" data-info="custom_cylinders" aria-label="Info about Cylinders">
+                  <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                </button>
+              </div>
+              <input type="number" name="custom_cylinders" min="2" max="16" step="1" value="8">
+            </label>
+            <label>
+              <div style="display:flex; justify-content:space-between; align-items:center">
+                Compression Ratio
+                <button type="button" class="info-btn" data-info="custom_compression_ratio" aria-label="Info about Compression Ratio">
+                  <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                </button>
+              </div>
+              <input type="number" name="custom_compression_ratio" min="7.0" max="15.0" step="0.1" value="10.5">
+            </label>
+            <label>
+              <div style="display:flex; justify-content:space-between; align-items:center">
+                Engine Weight (kg)
+                <button type="button" class="info-btn" data-info="custom_engine_weight_kg" aria-label="Info about Engine Weight">
+                  <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                </button>
+              </div>
+              <input type="number" name="custom_engine_weight_kg" min="50" max="500" step="1" value="200">
+            </label>
+            <label>
+              <div style="display:flex; justify-content:space-between; align-items:center">
+                Base Horsepower
+                <button type="button" class="info-btn" data-info="custom_base_hp" aria-label="Info about Base Horsepower">
+                  <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                </button>
+              </div>
+              <input type="number" name="custom_base_hp" min="50" max="1000" step="5" value="300">
+            </label>
+            <label>
+              <div style="display:flex; justify-content:space-between; align-items:center">
+                Base Torque (Nm)
+                <button type="button" class="info-btn" data-info="custom_base_torque_nm" aria-label="Info about Base Torque">
+                  <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                </button>
+              </div>
+              <input type="number" name="custom_base_torque_nm" min="50" max="1200" step="5" value="400">
+            </label>
+            <label>
+              <div style="display:flex; justify-content:space-between; align-items:center">
+                Forced Induction
+                <button type="button" class="info-btn" data-info="custom_forced_induction" aria-label="Info about Forced Induction">
+                  <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                </button>
+              </div>
+              <select name="custom_forced_induction">
+                <option value="0">Naturally Aspirated</option>
+                <option value="1">Turbocharged / Supercharged</option>
+              </select>
+            </label>
+            <label>
+              <div style="display:flex; justify-content:space-between; align-items:center">
+                Engine Layout
+                <button type="button" class="info-btn" data-info="custom_layout" aria-label="Info about Engine Layout">
+                  <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                </button>
+              </div>
+              <select name="custom_layout">
+                <option value="longitudinal">Longitudinal (Rear Wheel Drive bias)</option>
+                <option value="transverse">Transverse (Front Wheel Drive bias)</option>
+              </select>
+            </label>
+            <label>
+              <div style="display:flex; justify-content:space-between; align-items:center">
+                Engine Mount Width (mm)
+                <button type="button" class="info-btn" data-info="custom_donor_mount_width_mm" aria-label="Info about Engine Mount Width">
+                  <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                </button>
+              </div>
+              <input type="number" name="custom_donor_mount_width_mm" min="400" max="1000" step="10" value="700">
+            </label>
+ 
+            <div class="sandbox-section-title" style="margin-top: 15px;">Custom Recipient Chassis Specs</div>
+            
+            <label>
+              <div style="display:flex; justify-content:space-between; align-items:center">
+                Custom Chassis Name
+                <button type="button" class="info-btn" data-info="custom_chassis_name" aria-label="Info about Custom Chassis Name">
+                  <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                </button>
+              </div>
+              <input type="text" name="custom_chassis_name" value="Custom Lightweight Chassis" placeholder="e.g. custom tube frame">
+            </label>
+            <label>
+              <div style="display:flex; justify-content:space-between; align-items:center">
+                Curb Weight (kg)
+                <button type="button" class="info-btn" data-info="custom_recipient_weight_kg" aria-label="Info about Curb Weight">
+                  <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                </button>
+              </div>
+              <input type="number" name="custom_recipient_weight_kg" min="500" max="3000" step="10" value="1100">
+            </label>
+            <label>
+              <div style="display:flex; justify-content:space-between; align-items:center">
+                Stock Engine HP
+                <button type="button" class="info-btn" data-info="custom_stock_hp" aria-label="Info about Stock Engine Horsepower">
+                  <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                </button>
+              </div>
+              <input type="number" name="custom_stock_hp" min="30" max="600" step="5" value="140">
+            </label>
+            <label>
+              <div style="display:flex; justify-content:space-between; align-items:center">
+                Engine Bay Width (mm)
+                <button type="button" class="info-btn" data-info="custom_engine_bay_width_mm" aria-label="Info about Engine Bay Width">
+                  <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                </button>
+              </div>
+              <input type="number" name="custom_engine_bay_width_mm" min="500" max="1100" step="10" value="760">
+            </label>
+            <label>
+              <div style="display:flex; justify-content:space-between; align-items:center">
+                Wheelbase (mm)
+                <button type="button" class="info-btn" data-info="custom_wheelbase_mm" aria-label="Info about Wheelbase">
+                  <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                </button>
+              </div>
+              <input type="number" name="custom_wheelbase_mm" min="1500" max="3500" step="10" value="2450">
+            </label>
+            <label>
+              <div style="display:flex; justify-content:space-between; align-items:center">
+                Drag Coefficient (Cd)
+                <button type="button" class="info-btn" data-info="custom_drag_coefficient" aria-label="Info about Drag Coefficient">
+                  <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                </button>
+              </div>
+              <input type="number" name="custom_drag_coefficient" min="0.15" max="0.55" step="0.01" value="0.32">
+            </label>
+            <label>
+              <div style="display:flex; justify-content:space-between; align-items:center">
+                Stock Gear Ratio
+                <button type="button" class="info-btn" data-info="custom_stock_gear_ratio" aria-label="Info about Stock Gear Ratio">
+                  <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                </button>
+              </div>
+              <input type="number" name="custom_stock_gear_ratio" min="2.50" max="5.50" step="0.01" value="4.10">
+            </label>
+            <label>
+              <div style="display:flex; justify-content:space-between; align-items:center">
+                Drivetrain Type
+                <button type="button" class="info-btn" data-info="custom_drivetrain" aria-label="Info about Drivetrain Type">
+                  <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                </button>
+              </div>
+              <select name="custom_drivetrain">
+                <option value="RWD">RWD (Rear Wheel Drive)</option>
+                <option value="FWD">FWD (Front Wheel Drive)</option>
+                <option value="AWD">AWD (All Wheel Drive)</option>
+              </select>
+            </label>
+          </div>
+
+          <div id="catalog-engine-select" style="display: contents;">
+            <label>
+              <div style="display:flex; justify-content:space-between; align-items:center">
+                Donor Engine
+                <button type="button" class="info-btn" data-info="donor_engine" aria-label="Info about Donor Engine">
+                  <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                </button>
+              </div>
+              <select id="engine_code" name="engine_code" aria-label="Select Donor Engine"></select>
+            </label>
+          </div>
+          <div id="catalog-chassis-select" style="display: contents;">
+            <label>
+              <div style="display:flex; justify-content:space-between; align-items:center">
+                Recipient Chassis
+                <button type="button" class="info-btn" data-info="recipient_chassis" aria-label="Info about Recipient Chassis">
+                  <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                </button>
+              </div>
+              <select id="chassis_code" name="chassis_code" aria-label="Select Recipient Chassis"></select>
+            </label>
+          </div>
+          <label>
+            <div style="display:flex; justify-content:space-between; align-items:center">
+              <span>Tune Level: <span id="tune-value" style="color:var(--accent-primary)">0.65</span></span>
+              <button type="button" class="info-btn" data-info="tune_level" aria-label="Info about Tune Level">
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+              </button>
+            </div>
+            <input name="tune_level" type="range" min="0.2" max="0.95" step="0.01" value="0.65" aria-label="Adjust Tune Level">
+          </label>
+          <label>
+            <div style="display:flex; justify-content:space-between; align-items:center">
+              Cooling Capacity
+              <button type="button" class="info-btn" data-info="cooling_capacity" aria-label="Info about Cooling Capacity">
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+              </button>
+            </div>
+            <input name="cooling_capacity_index" type="number" min="0.35" max="1" step="0.01" value="0.74" aria-label="Cooling Capacity">
+          </label>
+          <label>
+            <div style="display:flex; justify-content:space-between; align-items:center">
+              Tire Grip
+              <button type="button" class="info-btn" data-info="tire_grip" aria-label="Info about Tire Grip">
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+              </button>
+            </div>
+            <input name="tire_grip_index" type="number" min="0.35" max="1" step="0.01" value="0.78" aria-label="Tire Grip">
+          </label>
+          <label>
+            <div style="display:flex; justify-content:space-between; align-items:center">
+              Suspension Readiness
+              <button type="button" class="info-btn" data-info="suspension_readiness" aria-label="Info about Suspension Readiness">
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+              </button>
+            </div>
+            <input name="suspension_index" type="number" min="0.35" max="1" step="0.01" value="0.72" aria-label="Suspension Readiness">
+          </label>
+          <label>
+            <div style="display:flex; justify-content:space-between; align-items:center">
+              Final Drive Ratio
+              <button type="button" class="info-btn" data-info="gear_ratio" aria-label="Info about Final Drive Ratio">
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+              </button>
+            </div>
+            <input name="gear_ratio" type="number" min="2.7" max="4.88" step="0.01" value="4.30" aria-label="Final Drive Ratio">
+          </label>
+          <button type="submit" style="grid-column: 1 / -1; margin-top: 10px;">Run Prediction</button>
+        </form>
+      </section>
+
+      <section class="grid result-grid">
+        <article class="panel">
+          <div style="display:flex; justify-content:space-between; align-items:center">
+            <div>
+              <p class="eyebrow">Regression Output</p>
+              <h2>Performance Stats</h2>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center;">
+              <button id="print-sheet-btn" type="button" style="padding: 6px 12px; font-size: 0.8rem; box-shadow: none; font-weight: bold; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: #fff; text-transform: none;">Print PDF</button>
+              <button type="button" class="info-btn" data-info="performance_stats" aria-label="Info about Performance Stats">
+                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+              </button>
+            </div>
+          </div>
+          <div id="prediction-cards" class="metric-grid"></div>
+        </article>
+        <article class="panel">
+          <div style="display:flex; justify-content:space-between; align-items:center">
+            <div>
+              <p class="eyebrow">Compatibility</p>
+              <h2>Fitment Readiness</h2>
+            </div>
+            <button type="button" class="info-btn" data-info="fitment_readiness" aria-label="Info about Fitment Readiness">
+              <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+            </button>
+          </div>
+          <div id="compatibility"></div>
+        </article>
+      </section>
+
+      <!-- Dyno Curve and Drag Strip section -->
+      <section class="grid result-grid">
+        <article class="panel" style="display: flex; flex-direction: column;">
+          <div style="display:flex; justify-content:space-between; align-items:center">
+            <div>
+              <p class="eyebrow">Simulation</p>
+              <h2>Dyno Performance Curve</h2>
+            </div>
+            <button type="button" class="info-btn" data-info="dyno_curve" aria-label="Info about Dyno Curve">
+              <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+            </button>
+          </div>
+          
+          <div class="dyno-container" id="dyno-graph-container">
+            <svg id="dyno-svg" width="100%" height="100%" viewBox="0 0 500 280">
+              <!-- Grid and curves will be dynamically injected here -->
+            </svg>
+            <div id="dyno-tooltip" class="dyno-tooltip"></div>
+          </div>
+          
+          <div class="dyno-legend">
+            <div class="legend-item">
+              <span class="legend-color" style="background: var(--accent-secondary)"></span>
+              <span>Horsepower (hp)</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-color" style="background: var(--accent-primary)"></span>
+              <span>Torque (Nm)</span>
+            </div>
+          </div>
+
+          <label style="margin-top: 20px;">
+            <div style="display:flex; justify-content:space-between">
+              <span>Dyno RPM Sweep: <span id="dyno-rpm-value" style="color:var(--accent-primary)">4,500</span> RPM</span>
+            </div>
+            <input type="range" id="dyno-rpm-sweep" min="1000" max="8000" step="50" value="4500" style="margin-top: 8px;">
+          </label>
+        </article>
+
+        <article class="panel" style="display: flex; flex-direction: column;">
+          <div style="display:flex; justify-content:space-between; align-items:center">
+            <div>
+              <p class="eyebrow">Drag Strip</p>
+              <h2>Virtual 1/4 Mile Simulation</h2>
+            </div>
+            <button type="button" class="info-btn" data-info="drag_strip" aria-label="Info about Drag Strip">
+              <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+            </button>
+          </div>
+
+          <div class="drag-strip-track">
+            <div class="drag-strip-tree">
+              <div class="tree-light tree-stage" id="light-stage"></div>
+              <div class="tree-light tree-amber" id="light-amber-1"></div>
+              <div class="tree-light tree-amber" id="light-amber-2"></div>
+              <div class="tree-light tree-green" id="light-green"></div>
+            </div>
+            <div class="drag-strip-road"></div>
+            <div class="drag-strip-finish"></div>
+            
+            <!-- Simple SVG side car sprite -->
+            <svg class="drag-car-sprite" id="drag-car" viewBox="0 0 60 25">
+              <path d="M5,15 L10,6 L45,6 L55,12 L58,15 L58,20 L55,22 L5,22 Z" fill="#38bdf8" stroke="#fff" stroke-width="1"></path>
+              <rect x="15" y="8" width="12" height="6" fill="#0f172a"></rect>
+              <rect x="30" y="8" width="10" height="6" fill="#0f172a"></rect>
+              <circle cx="15" cy="22" r="5" fill="#000" stroke="#fff" stroke-width="1.5"></circle>
+              <circle cx="45" cy="22" r="5" fill="#000" stroke="#fff" stroke-width="1.5"></circle>
+            </svg>
+          </div>
+
+          <div style="display: flex; gap: 10px; margin-top: 15px;">
+            <button id="drag-launch-btn" type="button" style="flex: 1;">Launch Engine!</button>
+            <button id="drag-reset-btn" type="button" style="background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: #fff; box-shadow: none;">Reset</button>
+          </div>
+
+          <div class="timeslip-card">
+            <div style="text-align: center; border-bottom: 2px solid rgba(255,255,255,0.2); padding-bottom: 6px; margin-bottom: 8px; font-weight: bold; color: var(--accent-tertiary);">
+              --- TIMESLIP ---
+            </div>
+            <div class="timeslip-row">
+              <span>Reaction Time:</span>
+              <span id="slip-rt">-.--- s</span>
+            </div>
+            <div class="timeslip-row">
+              <span>60 FT:</span>
+              <span id="slip-60ft">-.--- s</span>
+            </div>
+            <div class="timeslip-row">
+              <span>1/8 Mile:</span>
+              <span id="slip-18mile">-.--- s @ --.- mph</span>
+            </div>
+            <div class="timeslip-row">
+              <span>1/4 Mile:</span>
+              <span id="slip-14mile" style="font-weight: bold; color: var(--accent-primary);">-.--- s @ --.- mph</span>
+            </div>
+            <div class="timeslip-row" style="border: none;">
+              <span>0-60 MPH:</span>
+              <span id="slip-0-60" style="font-weight: bold; color: var(--accent-secondary);">-.-- s</span>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="grid result-grid">
+        <article class="panel">
+          <p class="eyebrow">Drivers</p>
+          <h2>Feature Importance</h2>
+          <div id="importance"></div>
+        </article>
+        <article class="panel">
+          <p class="eyebrow">Diagnostics</p>
+          <h2>Fitment Clearance Check</h2>
+          <div id="clearance-diagnostics" class="clearance-grid"></div>
+        </article>
+        <article class="panel">
+          <p class="eyebrow">Expert Advice</p>
+          <h2>Tuning Recommendations</h2>
+          <ul id="tips" class="tip-list"></ul>
+        </article>
+      </section>
+
+      <section class="grid result-grid">
+        <!-- Checklist & Cost Estimator -->
+        <article class="panel" style="display: flex; flex-direction: column;">
+          <div>
+            <p class="eyebrow">Build Planner</p>
+            <h2>Installation Checklist & Estimator</h2>
+          </div>
+          
+          <div class="checklist-container" id="checklist-container">
+            <!-- Checklist items will be injected here -->
+          </div>
+
+          <div class="checklist-total">
+            <div>
+              <span class="muted" style="font-weight: 600; font-size: 0.9rem;">Estimated Cost Total</span>
+              <h3 style="font-size: 1.8rem; margin: 5px 0 0 0; font-weight: 900; color: var(--accent-primary);" id="checklist-total-cost">$0</h3>
+            </div>
+            <div style="text-align: right;">
+              <span class="muted" style="font-weight: 600; font-size: 0.9rem;">Estimated Time</span>
+              <h3 style="font-size: 1.2rem; margin: 5px 0 0 0; font-weight: 900; color: #fff;" id="checklist-total-time">0 Weeks</h3>
+            </div>
+          </div>
+        </article>
+
+        <!-- Saved Garage -->
+        <article class="panel" style="display: flex; flex-direction: column;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <div>
+              <p class="eyebrow">Local Save</p>
+              <h2>My Saved Garage</h2>
+            </div>
+            <button id="save-build-btn" type="button" style="padding: 8px 16px; font-size: 0.85rem; text-transform: none; box-shadow: none;">Save Build</button>
+          </div>
+
+          <div id="garage-list" class="garage-grid">
+            <!-- Saved cards will be injected here -->
+          </div>
+        </article>
+      </section>
+
+
+      <section class="panel">
+        <div class="section-title">
+          <p class="eyebrow">Comparative Analysis</p>
+          <h2>Engine Leaderboard</h2>
+        </div>
+        <button id="compare-button" type="button">Compare All Engines for Current Chassis</button>
+        <div id="comparison" class="comparison"></div>
+      </section>
+
+      <section class="panel">
+        <div class="section-title">
+          <p class="eyebrow">Machine Learning</p>
+          <h2>Algorithms Used</h2>
+        </div>
+        <div id="algorithms" class="card-grid"></div>
+      </section>
+
+      <section class="panel">
+        <div class="section-title">
+          <p class="eyebrow">Data Sources</p>
+          <h2>Training Datasets</h2>
+        </div>
+        <div id="datasets" class="dataset-list"></div>
+      </section>
+    </main>
+
+    <!-- Info Modal -->
+    <div id="info-modal" class="modal">
+      <div class="modal-content">
+        <span class="close-btn">&times;</span>
+        <h2 id="modal-title" style="margin-bottom: 12px;">Parameter Info</h2>
+        <p id="modal-body" style="color: var(--text-muted); line-height: 1.6;"></p>
+      </div>
+    </div>
+
+    <script src="/app.js"></script>
+  </body>
+</html>
