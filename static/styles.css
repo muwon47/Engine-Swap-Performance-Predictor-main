@@ -886,3 +886,196 @@ input:checked + .slider:before {
     background: transparent !important;
   }
 }
+/* Responsive fixes for Render/mobile: prevent left clipping and collapse desktop grids */
+html {
+  overflow-x: hidden;
+}
+
+.panel,
+.metric,
+.algo,
+.dataset,
+.candidate,
+.timeslip-card,
+.checklist-item,
+.garage-card,
+.clearance-item {
+  min-width: 0;
+}
+
+.metric,
+.algo,
+.dataset,
+.candidate {
+  padding-left: 28px;
+}
+
+.metric > *,
+.algo > *,
+.dataset > *,
+.candidate > * {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 760px) {
+  body {
+    overflow-x: hidden;
+  }
+
+  .bg-layer {
+    left: -12%;
+    width: 124%;
+    filter: blur(10px) brightness(0.34) saturate(1.1);
+  }
+
+  .hero {
+    padding: 44px 18px 24px;
+  }
+
+  main {
+    width: 100%;
+    max-width: 100%;
+    padding: 0 14px 56px;
+    gap: 20px;
+  }
+
+  .panel {
+    width: 100%;
+    max-width: 100%;
+    border-radius: 20px;
+    padding: 22px 18px;
+    overflow: hidden;
+  }
+
+  .section-title {
+    margin-bottom: 18px;
+  }
+
+  h1 {
+    font-size: clamp(2.15rem, 11vw, 3.2rem);
+  }
+
+  h2 {
+    font-size: clamp(1.35rem, 7vw, 2rem);
+    line-height: 1.15;
+  }
+
+  h3 {
+    font-size: 1.05rem;
+  }
+
+  .lede {
+    font-size: 0.98rem;
+  }
+
+  .eyebrow {
+    letter-spacing: 0.22em;
+    font-size: 0.72rem;
+  }
+
+  .grid,
+  .form-grid,
+  .result-grid,
+  .metric-grid,
+  .card-grid,
+  .visuals-grid,
+  .comparison,
+  .dataset-list,
+  .garage-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px;
+  }
+
+  input,
+  select,
+  button {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .metric,
+  .algo,
+  .dataset,
+  .candidate {
+    padding: 18px 18px 18px 28px;
+  }
+
+  .metric strong {
+    font-size: clamp(1.8rem, 12vw, 2.6rem);
+    overflow-wrap: anywhere;
+  }
+
+  .candidate {
+    grid-template-columns: 1fr !important;
+    text-align: left;
+  }
+
+  .candidate strong {
+    font-size: 1.6rem;
+  }
+
+  .sandbox-toggle-container,
+  .checklist-total,
+  .timeslip-row,
+  .garage-card-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .checklist-item {
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+
+  .checklist-slider-label {
+    width: 100%;
+  }
+
+  .checklist-slider-label input {
+    width: 100%;
+  }
+
+  .dyno-container {
+    height: 220px;
+    overflow: hidden;
+  }
+
+  .dyno-legend {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .drag-strip-tree {
+    left: 18px;
+  }
+
+  .drag-strip-finish {
+    right: 24px;
+  }
+
+  .modal-content {
+    margin: 16% auto;
+    padding: 24px 18px;
+    width: calc(100% - 28px);
+  }
+}
+
+@media (max-width: 420px) {
+  main {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .panel {
+    padding: 20px 14px;
+  }
+
+  .metric,
+  .algo,
+  .dataset,
+  .candidate {
+    padding-left: 26px;
+  }
+}
